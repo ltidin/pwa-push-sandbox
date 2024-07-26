@@ -1,7 +1,7 @@
 import { urlB64ToUint8Array } from './urlB64ToUint8Array.js';
 
-const serverUrl = `http://${window.location.hostname}:3000`;
-
+// const serverUrl = `http://${window.location.hostname}:3000`;
+const serverUrl = `https://service-worker-web-push-example-server.cfapps.us10-001.hana.ondemand.com`;
 export const getPermission = () => {
   Notification.requestPermission(function (status) {
     console.log('Notification permission status:', status);
@@ -58,8 +58,11 @@ export const sendMessageViaServer = async () => {
 };
 
 export const displayNotificationDirectly = async () => {
+  alert(Notification.permission
+    || null
+  );
   if (Notification.permission !== 'granted') {
-    console.log('notification permission missing');
+    alert('notification permission missing');
     return;
   }
 

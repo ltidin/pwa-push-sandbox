@@ -1,0 +1,6 @@
+applications:
+- name: service-worker-web-push-example-client
+  health-check-type: process
+  # health-check-http-endpoint: /health
+  buildpacks:
+  - nodejs_buildpack
