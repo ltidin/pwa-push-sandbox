@@ -4,12 +4,16 @@
 		<pages>
 			<Page title="{i18n>title}">
 				<content>
-					<List noDataText="No tasks for now." id="listTodo" inset="true" mode="Delete" delete="onDeleteItem"/>
+				 <Button text="Subscribe" id="buttonSubscribe" press="onPressSubscribe" enabled="true"/>
+				<!--<Button text="Register Subscription" id="buttonRegister" press="onPressRegister" enabled="true"/> -->
+				<Button text="Unsubscribe" id="buttonUnsubscribe" press="onPressUnsubscribe" enabled="true"/>
+				<Button text="Send Notification via server" id="buttonSendNotification" press="onPressSendNotification" enabled="true"/>
+					<!-- <List noDataText="No tasks for now." id="listTodo" inset="true" mode="Delete" delete="onDeleteItem"/> -->
 				</content>
 				<footer>
 					<Toolbar width="100%" id="toolbarFooter">
-						<Input value="" placeholder="New task.." id="inputAddTask" liveChange="onLiveChangeAddTask"/>
-						<Button text="Add" id="buttonAddTask" press="onPressAddTask" enabled="false"/>
+						<!-- <Input value="" placeholder="New task.." id="inputAddTask" liveChange="onLiveChangeAddTask"/> -->
+						
 					</Toolbar>
 				</footer>
 			</Page>
