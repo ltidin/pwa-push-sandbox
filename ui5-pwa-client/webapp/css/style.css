@@ -1,0 +1,18 @@
+/** 
+ *Splash screen 
+ */
+body {
+    background: #244C7C;
+}
+
+#splash-screen {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#splash-logo {
+    height: 20rem;
+    width: 20rem;
+}
