@@ -20,14 +20,14 @@ app.use(bodyParser.json())
 
 
 // domo only! keys should be stored in a secure way outside of the code
-const pubkey = 'BH19JAvACS1b2J9qa2kLXq0bEmP9NNfAqJMJyzlMtVef36wvt3HX_1KGSdzRmfhqXPj460ZP7WzBKRk1Fl6O6pc';
-const privatekey = 'FHAee6f4Af0KzE81At2UmHxY5eM3gaj-dU715KfKvQQ';
-
+// const pubkey = 'BH19JAvACS1b2J9qa2kLXq0bEmP9NNfAqJMJyzlMtVef36wvt3HX_1KGSdzRmfhqXPj460ZP7WzBKRk1Fl6O6pc';
+// const privatekey = 'FHAee6f4Af0KzE81At2UmHxY5eM3gaj-dU715KfKvQQ';
+const vapidKeys = webpush.generateVAPIDKeys()
 webpush.setVapidDetails(
   // used in case the push service notice a problem with your feed and need to contact you
   'mailto:you@example.com',
-  pubkey,
-  privatekey
+  vapidKeys.publicKey,
+  vapidKeys.privateKey
 );
 
 const pushSubscriptions = new Map();
@@ -35,7 +35,7 @@ const pushSubscriptions = new Map();
 
 
 app.get('/pubkey', async (request, reply) => {
-  reply.send({ pubkey }) ;
+  reply.send({ pubkey: vapidKeys.publicKey }) ;
 })
 
 app.post('/subscription', async (request, reply) => {

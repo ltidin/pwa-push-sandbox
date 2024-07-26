@@ -21,7 +21,7 @@ sap.ui.define([
 					console.log('No notification permission granted!');
 				} else {
 					console.log('Notification permission granted!');
-					this.onPressRegister().then();
+					// this.onPressRegister().then();
 					// displayConfirmNotification();
 					// configurePushSubscription();
 				}
@@ -36,14 +36,94 @@ sap.ui.define([
 		onPressRegister: async function (oEvent) {
 			const { pubkey } = await fetch(`${serverUrl}/pubkey`).then((res) => res.json());
 			console.log('fetched public key:', pubkey);
-			const subscription = await navigator.serviceWorker
-				.getRegistration() //
+			let subscription;
+
+
+
+			subscription = navigator.serviceWorker
+				.getRegistration()
 				.then((registration) => {
-					return registration.pushManager.subscribe({
-						userVisibleOnly: true,
-						applicationServerKey: this._urlB64ToUint8Array(pubkey),
-					});
-				});
+					registration.pushManager.getSubscription()
+						.then(pushSubscription => {
+							if (!pushSubscription) {
+								//the user was never subscribed
+								return registration.pushManager.subscribe({
+									userVisibleOnly: true,
+									applicationServerKey: this._urlB64ToUint8Array(pubkey),
+								}).then(subscription => {
+									console.log('created subscription:', subscription);
+									// in production we would send it directly to our server and not store it on the window
+									window.mySubscription = subscription;
+									if (!window.mySubscription) {
+										console.log('No subscription yet created');
+										return;
+									}
+									const subscriptionToSend = JSON.stringify(window.mySubscription.toJSON(), null, 2);
+
+									fetch(`${serverUrl}/subscription`, {
+										method: 'POST',
+										body: subscriptionToSend,
+										headers: {
+											'Content-Type': 'application/json',
+										},
+									})
+										.then((res) => console.log('successfully send subscription to server'))
+										.catch((err) => console.log('error while sending to server', err));
+								});
+							}
+							else {
+								//check if user was subscribed with a different key
+								let json = pushSubscription.toJSON();
+								let public_key = json.keys.p256dh;
+
+								console.log(public_key);
+
+								if (public_key != pubkey) {
+									pushSubscription.unsubscribe().then(successful => {
+										// You've successfully unsubscribed
+										return registration.pushManager.subscribe({
+											userVisibleOnly: true,
+											applicationServerKey: this._urlB64ToUint8Array(pubkey),
+										}).then(subscription => {
+											console.log('created subscription:', subscription);
+											// in production we would send it directly to our server and not store it on the window
+											window.mySubscription = subscription;
+											if (!window.mySubscription) {
+												console.log('No subscription yet created');
+												return;
+											}
+											const subscriptionToSend = JSON.stringify(window.mySubscription.toJSON(), null, 2);
+
+											fetch(`${serverUrl}/subscription`, {
+												method: 'POST',
+												body: subscriptionToSend,
+												headers: {
+													'Content-Type': 'application/json',
+												},
+											})
+												.then((res) => console.log('successfully send subscription to server'))
+												.catch((err) => console.log('error while sending to server', err));
+										});
+									}).catch(e => {
+										console.log(e);
+										// Unsubscription failed
+									})
+								}
+							}
+						});
+				}
+				);
+
+
+			// .then((registration) => {
+			// 	return registration.pushManager.subscribe({
+			// 		userVisibleOnly: true,
+			// 		applicationServerKey: this._urlB64ToUint8Array(pubkey),
+			// 	});
+			// });
+
+		},
+		_subscribe(subscription) {
 			console.log('created subscription:', subscription);
 			// in production we would send it directly to our server and not store it on the window
 			window.mySubscription = subscription;
